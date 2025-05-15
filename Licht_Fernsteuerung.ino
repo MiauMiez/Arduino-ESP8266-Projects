@@ -1,4 +1,4 @@
-//Alexander Scholz, May 15 2025
+//Alexander Scholz, May 15 2025 - Verbindet eine ESP Schaltung mit dem Router und hostet einen Webserver, der ermöglicht im gleichen lokalen Netzwerk die LED's zu steuern. 
 #include <ESP8266WiFi.h>    
 #include <ESP8266WebServer.h>  
 
@@ -9,15 +9,13 @@ const int buttonPin = 2;
 int buttonState = 0 ;
 bool light_state; 
 
-
-//Netzwerk 
+//Lokales Netzwerk ohne Internetanbindng  
 const char* ssid = "Elektrolabor_no_Internet";
 const char* pwd =  "topsecret"; 
 ESP8266WebServer server(80);
 
 void setup() {
-  // initialize digital pin LED_BUILTIN as an output.
-  
+ 
   pinMode(led_red, OUTPUT);
   pinMode(led_green, OUTPUT);
   pinMode(led_blue, OUTPUT);
@@ -31,6 +29,7 @@ void setup() {
     digitalWrite(led_red, HIGH);
   }
 
+  //LED leuchtet rot bis eine Verbindung steht 
   digitalWrite(led_red, LOW);
   digitalWrite(led_green, HIGH);
   delay(1000); 
@@ -62,61 +61,28 @@ void setup() {
   );
 });
 
-
-
-   //Licht management 
-       server.on("/on", []() {
-      
+  server.on("/on", []() {
        light_state = true; 
        server.sendHeader("Location", "/");
        server.send(303); 
     });
 
-        server.on("/off", []() {
-      
+  server.on("/off", []() {
       light_state = false; 
       server.sendHeader("Location", "/");
       server.send(303);
     });
     
-  
   server.begin();
 }
    
-
 void loop() {
 
     server.handleClient();
 
-
     if (light_state) {
           digitalWrite(led_blue, HIGH);
       } else {
-        digitalWrite(led_blue, LOW);
-      }
-
-    //buttonState = digitalRead(buttonPin);
-
-
-  /*
-    if (buttonState == HIGH) {
-       digitalWrite(led_blue, LOW);
-          
-      
-    } else {
-
-         for(int i = 0; i<255; i++){
-            analogWrite(led_blue, i);
-            delay(10);
-          }
-        
-          for (int i = 255; i >= 0; i--) {
-            analogWrite(led_blue, i);
-            delay(10);
-          }
-          
-    } smb://172.16.11.28/sambashare - huaelektro 
-
-    */
-       
+          digitalWrite(led_blue, LOW);
+    }
 }
